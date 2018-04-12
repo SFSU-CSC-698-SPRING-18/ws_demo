@@ -1,6 +1,9 @@
 const WebSocket = require('ws');
 const packageData = require('./package.json');
 const readline = require('readline');
+const ip = require('ip');
+
+const clientIp = ip.address();
 
 const lineInterface = readline.createInterface({
 	input: process.stdin,
@@ -14,20 +17,31 @@ let host = 'localhost';
 if (process.argv.length === 3) {
 	host = process.argv[2];
 }
+
 const address = `ws:\/\/${host}:${packageData.port}`;
 console.log(`connecting to ${address}`);
+console.log(`client ip is ${clientIp}`);
 const client = new WebSocket(address);
 
 client.on('open', (ws) => {
 	console.log('connected');
 	lineInterface.on('line', function(line){
-		console.log(line);
-		client.send(line);
+		client.send(JSON.stringify({
+			data: line,
+			command: 'MESSAGE',
+			ip: clientIp,
+		}));
 	});
+
+	client.send(JSON.stringify({
+		command: 'OPEN',
+		ip: clientIp,
+	}));
 });
 
 client.on('message', (message) => {
-	console.log('received: %s', message);
+	const messageData = JSON.parse(message);
+	console.log(`${messageData.ip} sent :  ${messageData.data}`);
 });
 
 client.on('close', () => {

@@ -21,6 +21,7 @@
   },
   "homepage": "https://github.com/SFSU-CSC-698-SPRING-18/ws_demo#readme",
   "dependencies": {
+    "ip": "^1.1.5",
     "ws": "^5.1.1"
   }
 }

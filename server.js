@@ -2,7 +2,9 @@ const WebSocket = require('ws');
 const packageData = require('./package.json');
 const readline = require('readline');
 const ip = require('ip');
+const BlockChain = require('./BlockChain.js');
 
+const blockChain = new BlockChain(3);
 const serverIp = ip.address();
 
 const lineInterface = readline.createInterface({
@@ -24,11 +26,16 @@ const broadcast = (data) => {
 };
 
 lineInterface.on('line', (line) => {
-	broadcast(JSON.stringify({
-		data: line,
-		command: 'MESSAGE',
-		ip: serverIp,
-	}));
+	if (line === 'hack') {
+		blockChain.blockChain[1].data = 'hack yo data';
+		console.log(blockChain);
+		console.log('Valid hash :', blockChain.validateChain());
+	} else {
+		const messageString = `${serverIp} sent :  ${line}`;
+		blockChain.addBlock(messageString);
+		console.log(blockChain);
+		broadcast(JSON.stringify(blockChain));
+	}
 });	
 
 server.on('connection', (ws) => {
@@ -39,10 +46,13 @@ server.on('connection', (ws) => {
 				console.log(`${messageData.ip} has connected`);
 				break;
 			case 'MESSAGE':
-				console.log(`${messageData.ip} sent :  ${messageData.data}`);
+				const messageString = `${messageData.ip} sent :  ${messageData.data}`;
+				console.log(messageString);
+				blockChain.addBlock(messageString);
+				console.log(blockChain);
 				server.clients.forEach((client) => {
-					if (client !== ws && client.readyState === WebSocket.OPEN) {
-						client.send(message);
+					if (client.readyState === WebSocket.OPEN) {
+						client.send(JSON.stringify(blockChain));
 					}
 				});
 				break;

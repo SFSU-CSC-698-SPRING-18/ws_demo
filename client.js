@@ -1,6 +1,7 @@
 const WebSocket = require('ws');
 const packageData = require('./package.json');
 const readline = require('readline');
+const BlockChain = require('./BlockChain.js');
 const ip = require('ip');
 
 const clientIp = ip.address();
@@ -25,7 +26,7 @@ const client = new WebSocket(address);
 
 client.on('open', (ws) => {
 	console.log('connected');
-	lineInterface.on('line', function(line){
+	lineInterface.on('line', (line) => {
 		client.send(JSON.stringify({
 			data: line,
 			command: 'MESSAGE',
@@ -41,7 +42,10 @@ client.on('open', (ws) => {
 
 client.on('message', (message) => {
 	const messageData = JSON.parse(message);
-	console.log(`${messageData.ip} sent :  ${messageData.data}`);
+	const blockChain = BlockChain.loadBlockChain(messageData);
+	console.log(blockChain);
+	console.log('Valid chain :', blockChain.validateChain());
+	console.log('Message is ', blockChain.getMessage());
 });
 
 client.on('close', () => {

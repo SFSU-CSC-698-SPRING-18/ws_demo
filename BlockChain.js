@@ -13,7 +13,7 @@ class BlockChain {
 			lastHash = this.blockChain[this.blockChain.length - 1].hash;
 		}
 		const block = new Block(data, lastHash);
-		block.mine(this.difficulty);
+		// block.mine(this.difficulty);
 		this.blockChain.push(block);
 		console.log('Time Taken to add block : ', Date.now() - startTime);
 	}
@@ -32,11 +32,12 @@ class BlockChain {
 			if (previousBlock.hash !== currentBlock.previousHash) {
 				return false;
 			}
-
+			/*
 			if (currentBlock.hash.substring(0, this.difficulty) !== this.target) {
 				console.log('block was not mined');
 				return false;
 			}
+			*/
 		}
 		return true;
 	}

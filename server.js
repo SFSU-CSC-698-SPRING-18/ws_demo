@@ -3,9 +3,11 @@ const packageData = require('./package.json');
 const readline = require('readline');
 const ip = require('ip');
 const BlockChain = require('./BlockChain.js');
+const Block = require('./Block.js');
 
-const blockChain = new BlockChain(3);
+const blockChain = new BlockChain(packageData.difficulty);
 const serverIp = ip.address();
+let isMining = false;
 
 const lineInterface = readline.createInterface({
 	input: process.stdin,
@@ -26,16 +28,11 @@ const broadcast = (data) => {
 };
 
 lineInterface.on('line', (line) => {
-	if (line === 'hack') {
-		blockChain.blockChain[1].data = 'hack yo data';
-		console.log(blockChain);
-		console.log('Valid hash :', blockChain.validateChain());
-	} else {
-		const messageString = `${serverIp} sent :  ${line}`;
-		blockChain.addBlock(messageString);
-		console.log(blockChain);
-		broadcast(JSON.stringify(blockChain));
-	}
+    const messageString = `${serverIp} sent :  ${line}`;
+    const block = new Block(messageString, blockChain.getLastHash());
+    console.log(block);
+    isMining = true;
+    broadcast(JSON.stringify(block));
 });	
 
 server.on('connection', (ws) => {
@@ -45,16 +42,15 @@ server.on('connection', (ws) => {
 			case 'OPEN':
 				console.log(`${messageData.ip} has connected`);
 				break;
-			case 'MESSAGE':
-				const messageString = `${messageData.ip} sent :  ${messageData.data}`;
-				console.log(messageString);
-				blockChain.addBlock(messageString);
-				console.log(blockChain);
-				server.clients.forEach((client) => {
-					if (client.readyState === WebSocket.OPEN) {
-						client.send(JSON.stringify(blockChain));
-					}
-				});
+			case 'MINE_COMPLETE':
+				// test block
+                if (isMining) {
+                    const block = Block.loadBlock(messageData.block);
+                    console.log(`${messageData.ip} wins`);
+                    blockChain.addBlock(block);
+                    console.log(blockChain);
+                    isMining = false;
+                }
 				break;
 			default:
 			console.log('unknown command');

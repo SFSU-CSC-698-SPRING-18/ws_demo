@@ -6,17 +6,16 @@ class BlockChain {
 		this.difficulty = difficulty;
 		this.target = new Array(difficulty + 1).join('0');
 	}
-	addBlock(data) {
-		const startTime = Date.now();
-		let lastHash = '0'; // starting hash
-		if (this.blockChain.length > 0) {
-			lastHash = this.blockChain[this.blockChain.length - 1].hash;
-		}
-		const block = new Block(data, lastHash);
-		block.mine(this.difficulty);
+	addBlock(block) {
 		this.blockChain.push(block);
-		console.log('Time Taken to add block : ', Date.now() - startTime);
 	}
+	getLastHash() {
+        let lastHash = '0'; // starting hash
+        if (this.blockChain.length > 0) {
+            lastHash = this.blockChain[this.blockChain.length - 1].hash;
+        }
+        return lastHash;
+    }
 	validateChain() {
 		// make sure there are at least 2 for this to work
 		// todo: catch all corner cases

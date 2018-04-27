@@ -10,12 +10,12 @@ Once you have that, run this command in the directory
 ```
 npm install
 ```
-To start the server 
+To start the server
 ```
-node server.js
+node minerjs
 ```
-To start the client.
+To start the miner.
 ```
-node client.js <ip optional>
+node miner.js<ip optional>
 ```
-Starting the client with no ip will default to localhost.
+Starting the miner with no ip will default to localhost.

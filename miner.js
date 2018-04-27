@@ -2,6 +2,8 @@ const WebSocket = require('ws');
 const packageData = require('./package.json');
 const readline = require('readline');
 const BlockChain = require('./BlockChain.js');
+const Block = require('./Block.js');
+
 const ip = require('ip');
 
 const clientIp = ip.address();
@@ -22,32 +24,24 @@ if (process.argv.length === 3) {
 const address = `ws:\/\/${host}:${packageData.port}`;
 console.log(`connecting to ${address}`);
 console.log(`client ip is ${clientIp}`);
-const client = new WebSocket(address);
+const miner = new WebSocket(address);
 
-client.on('open', (ws) => {
+miner.on('open', (ws) => {
 	console.log('connected');
-	lineInterface.on('line', (line) => {
-		client.send(JSON.stringify({
-			data: line,
-			command: 'MESSAGE',
-			ip: clientIp,
-		}));
-	});
-
-	client.send(JSON.stringify({
-		command: 'OPEN',
-		ip: clientIp,
-	}));
 });
 
-client.on('message', (message) => {
+miner.on('message', (message) => {
 	const messageData = JSON.parse(message);
-	const blockChain = BlockChain.loadBlockChain(messageData);
-	console.log(blockChain);
-	console.log('Valid chain :', blockChain.validateChain());
-	console.log('Message is ', blockChain.getMessage());
+	const block = Block.loadBlock(messageData);
+    block.mine(packageData.difficulty);
+    console.log(block);
+    miner.send(JSON.stringify({
+        command: 'MINE_COMPLETE',
+        ip: clientIp,
+        block,
+    }))
 });
 
-client.on('close', () => {
+miner.on('close', () => {
 	console.log('connection closed');
 });

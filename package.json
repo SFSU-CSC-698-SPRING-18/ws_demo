@@ -4,6 +4,7 @@
   "description": "Websocket demo",
   "main": "server.js",
   "port": 9999,
+  "difficulty": 4,
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

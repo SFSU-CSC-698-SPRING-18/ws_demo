@@ -25,15 +25,19 @@ class BlockChain {
 			currentBlock = this.blockChain[i];
 			previousBlock = this.blockChain[i - 1];
 			if (currentBlock.hash !== currentBlock.generateHash()) {
+				console.log(currentBlock.hash);
+				console.log(currentBlock.generateHash());
+				console.log('current hash is wrong at block', i);
 				return false;
 			}
 
 			if (previousBlock.hash !== currentBlock.previousHash) {
+                console.log('last hash is wrong at block', i);
 				return false;
 			}
 
 			if (currentBlock.hash.substring(0, this.difficulty) !== this.target) {
-				console.log('block was not mined');
+				console.log('block was not mined at', i);
 				return false;
 			}
 		}

@@ -3,6 +3,7 @@ const packageData = require('./package.json');
 const readline = require('readline');
 const BlockChain = require('./BlockChain.js');
 const Block = require('./Block.js');
+const addon = require('./build/Release/addon');
 
 const ip = require('ip');
 
@@ -33,7 +34,11 @@ miner.on('open', (ws) => {
 miner.on('message', (message) => {
 	const messageData = JSON.parse(message);
 	const block = Block.loadBlock(messageData);
-    block.mine(packageData.difficulty);
+    // block.mine(packageData.difficulty);
+    console.log('minining', block.getMineData());
+    const minedData = addon.mine(block.getMineData());
+    block.nonce = minedData.nonce;
+    block.hash = minedData.hash;
     console.log(block);
     miner.send(JSON.stringify({
         command: 'MINE_COMPLETE',

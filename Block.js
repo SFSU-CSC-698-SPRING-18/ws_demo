@@ -11,8 +11,11 @@ class Block {
 	generateHash() {
 		return sha256(this.previousHash + this.timeStamp + this.data + this.nonce);
 	}
+	getMineData() {
+		return this.previousHash + this.timeStamp + this.data;
+	}
 	mine(difficulty) {
-		const target = new Array(difficulty + 1).join('0');
+		const target = new Array(difficulty + 1).join('0'); // 0000
 		while (this.hash.substring(0, difficulty) !== target) {
 			this.nonce++; // keep trying different nonce until you get a hit
 			this.hash = this.generateHash();
